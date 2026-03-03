@@ -8,6 +8,8 @@
     box-sizing: border-box;
 }
 
+body {z-index: 0;}
+
 header {
     border: 3px grey;
     width: 100vw;
@@ -26,6 +28,7 @@ header {
 }
 #login {
     display: flex;
+    z-index: 1;
     width: 10%;
     height: 40px;
     margin-top: auto;
@@ -42,6 +45,7 @@ header {
 }
 #cart {
     display: flex;
+    z-index: 1;
     width: 10%;
     height: 40px;
     margin-top: auto;
@@ -72,6 +76,68 @@ header {
     justify-self: center;
 }
 
+#userLoginPage {
+    position: absolute;
+    z-index: 2;
+    background-color: blue;
+    border: 1px black solid;
+}
+#userLoginForm {
+    position: absolute;
+    z-index: 2;
+    background-color: lightblue;
+    border: 1px black solid;
+
+    grid-row: 1fr 1fr 1fr 1fr 1fr;
+    grid-column: 1fr 3fr 1fr;
+
+    grid-template-areas: 
+      '. . .'
+    '. name .'
+      '. . .'
+    '. pass .'
+      '. . .';
+}
+
+#userCreatePage {
+    display: contents;
+    background-color: blue;
+    border: 1px black solid;
+
+    grid-row: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;/*Like counting stairs*/
+    grid-column: 1fr 3fr 1fr;/*If those stairs had lanes*/
+
+    grid-template-areas: 
+      '. . .'
+    '. name .'
+      '. . .'
+    '. pass1 .'
+      '. . .'
+    '. pass2 .'
+      '. . .'
+    '. email .'
+      '. . .';
+}
+#userCreateForm {
+    display: grid;
+    background-color: lightblue;
+    border: 1px solid black;
+}
+
+/*Common ruleset cause why not*/
+#loginName,#loginPassword,#createName,#createPassword,#confirmPassword,#confirmEmail {
+    background-color: violet;
+    border: 2px black solid;
+} /*Below belongs to userLogin*/
+#loginName {grid-area: 'name';}
+#loginPassword {grid-area: 'pass';}
+/*Below belongs to userCreate*/
+#createName {grid-area: 'name';}
+#createPassword {grid-area: 'pass1';}
+#confirmPassword {grid-area: 'pass2';}
+#confirmEmail {grid-area: 'email';}
+
+
 main {
     width: 100vw;
     height: auto;
@@ -83,8 +149,30 @@ main {
     border: 3px black solid;
     justify-self: center;
 }
+.product {
+    border: 1px black solid;
+    display: grid;
+    grid-row: 1fr 1fr 1fr 1fr 1fr;
+    grid-column: 1fr 1fr 1fr 1fr;
+
+    grid-template-areas: 
+    '. title title .'
+    'desc desc desc desc'
+    'desc desc desc desc'
+    'desc desc desc desc'
+    '. price price plus';
+} /*how to structure*/
+.productTitle {grid-area: 'title'; color: var(--wildOption);}
+.productDescription {grid-area: 'desc'; color: var(--secondaryColor);}
+.productPrice {grid-area: 'price'; color: var(--wildOption);}
+.plusButton {grid-area: 'plus'; color: var(--secondaryColor);}
+
+.productTitle,.productDescription,.productPrice {
+    border: 1px black solid;
+}
 
 footer {
+    background-color: yellow;
     width: 100vw;
     height: 10vh;
     border: 2px black solid;
