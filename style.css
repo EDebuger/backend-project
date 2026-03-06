@@ -1,173 +1,149 @@
 :root {
-    --primaryColor: #dc143c;
+    --primaryColor: #cd1010;
     --secondaryColor: #ff033e;
     --accentColor: #bcd4e6;
-    --wildOption: #da9100;
+    --linecColor: #e28812; /*Märkte stavningen efteråt, men ingen poäng att ändra på*/
+    --ligthLineColor: #f6f15c;
+    --wildOption: #da9100; /*För varför inte*/
 }
 * {
     box-sizing: border-box;
 }
 
-body {z-index: 0;}
+#mainBody {z-index: 0;}
+#loginBody {background-color: var(--primaryColor);}
 
-header {
-    border: 3px grey;
+#mainHeader {
+    border: 3px var(--linecColor);
     width: 100vw;
     height: 20vh;
     margin-left: 0;
-    background-color: red;
+    background-color: var(--secondaryColor);
 }
 
 #top {
     display: flex;
     width: 100%;
     height: 60%;
-    border: 2px black solid;
-    background-color: green;
+    border: 2px var(--linecColor) solid;
+    background-color: red;
     justify-content: space-between;
 }
 #login {
     display: flex;
+    justify-content: center;
     z-index: 1;
     width: 10%;
     height: 40px;
     margin-top: auto;
     margin-bottom: auto;
-    border: 1px grey solid;
+    border: 1px var(--ligthLineColor) solid; /*Lite ful*/
 }
 #logo {
     display: flex;
+    justify-content: center;
     width: 10%;
     height: 40px;
     margin: auto;
     padding-right: 0;
-    border: 1px grey solid;
+    border: 1px var(--ligthLineColor) solid;
 }
 #cart {
     display: flex;
+    justify-content: center;
     z-index: 1;
     width: 10%;
     height: 40px;
     margin-top: auto;
     margin-bottom: auto;
-    border: 1px grey solid;
+    border: 1px var(--ligthLineColor) solid;
 }
 
 #categories {
     display: flex;
+    overflow-wrap: auto;
+    justify-content: space-between;
     width: 100%;
     height: 40%;
-    border: 2px black solid;
-    background-color: green;
+    border: 2px var(--linecColor) solid;
+    background-color: var(--primaryColor);
     justify-content: space-evenly;
 }
 
 .category {
+    position: relative;
+    background-color: var(--wildOption);
+    color: rgb(246, 246, 110);
+    text-decoration: underline;
     width: 70px;
     height: 80%;
     margin: auto;
-    border: 2px grey solid;
+    border: 2px var(--linecColor) solid;
     align-items: center;
 }
 .category p {
     display: flex;
-    flex-grow: 1;
-    font-size: 13px;
+    flex-shrink: 1;
+    font-size: 12px;
     justify-self: center;
 }
 
-#userLoginPage {
-    position: absolute;
-    z-index: 2;
-    background-color: blue;
-    border: 1px black solid;
-}
-#userLoginForm {
-    position: absolute;
-    z-index: 2;
-    background-color: lightblue;
-    border: 1px black solid;
-
-    grid-row: 1fr 1fr 1fr 1fr 1fr;
-    grid-column: 1fr 3fr 1fr;
-
-    grid-template-areas: 
-      '. . .'
-    '. name .'
-      '. . .'
-    '. pass .'
-      '. . .';
-}
-
-#userCreatePage {
-    display: contents;
-    background-color: blue;
-    border: 1px black solid;
-
-    grid-row: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;/*Like counting stairs*/
-    grid-column: 1fr 3fr 1fr;/*If those stairs had lanes*/
-
-    grid-template-areas: 
-      '. . .'
-    '. name .'
-      '. . .'
-    '. pass1 .'
-      '. . .'
-    '. pass2 .'
-      '. . .'
-    '. email .'
-      '. . .';
-}
-#userCreateForm {
-    display: grid;
-    background-color: lightblue;
-    border: 1px solid black;
-}
-
-/*Common ruleset cause why not*/
-#loginName,#loginPassword,#createName,#createPassword,#confirmPassword,#confirmEmail {
-    background-color: violet;
-    border: 2px black solid;
-} /*Below belongs to userLogin*/
-#loginName {grid-area: 'name';}
-#loginPassword {grid-area: 'pass';}
-/*Below belongs to userCreate*/
-#createName {grid-area: 'name';}
-#createPassword {grid-area: 'pass1';}
-#confirmPassword {grid-area: 'pass2';}
-#confirmEmail {grid-area: 'email';}
 
 
 main {
     width: 100vw;
     height: auto;
 }
-#productPage {
+#productPage { /*parent*/
     display: flex;
+    flex-wrap: wrap;
     width: 80vw;
     height: 80vh;
-    border: 3px black solid;
+    border: 3px var(--linecColor) solid;
     justify-self: center;
 }
+#productFilters {
+    display: block;
+    
+}
 .product {
+    height: 200px;
+    width: 130px;
+    margin-left: 10px;
+    margin-right: 10px;
     border: 1px black solid;
     display: grid;
-    grid-row: 1fr 1fr 1fr 1fr 1fr;
-    grid-column: 1fr 1fr 1fr 1fr;
-
+    grid-template-columns: 1fr; /* One column layout */
+    grid-template-rows: repeat(5, 1fr); /* Five equal rows */
     grid-template-areas: 
-    '. title title .'
-    'desc desc desc desc'
-    'desc desc desc desc'
-    'desc desc desc desc'
-    '. price price plus';
-} /*how to structure*/
-.productTitle {grid-area: 'title'; color: var(--wildOption);}
-.productDescription {grid-area: 'desc'; color: var(--secondaryColor);}
-.productPrice {grid-area: 'price'; color: var(--wildOption);}
-.plusButton {grid-area: 'plus'; color: var(--secondaryColor);}
+        '. title title .'
+        'desc desc desc desc'
+        'desc desc desc desc'
+        'desc desc desc desc'
+        '. price price plus';
+}
 
-.productTitle,.productDescription,.productPrice {
+.productTitle {
+    grid-area: title; /* No quotes needed */
+    color: var(--wildOption);
+    border: 1px black solid;
+}
+
+.productDescription {
+    grid-area: desc; /* No quotes needed */
+    color: var(--secondaryColor);
+    border: 1px black solid;
+}
+
+.productPrice {
+    grid-area: price; /* No quotes needed */
+    color: var(--wildOption);
+    border: 1px black solid;
+}
+
+.plusButton {
+    grid-area: plus; /* No quotes needed */
+    color: var(--secondaryColor);
     border: 1px black solid;
 }
 
