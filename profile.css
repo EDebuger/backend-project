@@ -1,0 +1,65 @@
+:root {
+    --primaryColor: #cd1010;
+    --secondaryColor: #ff033e;
+    --accentColor: #bcd4e6;
+    --lineColor: #e28812; /* Corrected spelling */
+    --lightLineColor: #f6f15c;
+    --wildOption: #da9100; /* Just because */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--accentColor);
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    background: var(--primaryColor);
+    color: #ffffff;
+    padding: 10px 0;
+    text-align: center;
+    border-bottom: 2px solid var(--lineColor); /* Adding a bottom line */
+}
+
+h1 {
+    margin: 0;
+}
+
+#profileHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#logoutButton {
+    background-color: var(--secondaryColor);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+#logoutButton:hover {
+    background-color: var(--wildOption); /* Change to wild color on hover */
+}
+
+main {
+    padding: 20px;
+    background: white;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border: 2px solid var(--lineColor); /* Adding a border */
+}
+
+footer {
+    margin-top: 20px;
+    text-align: center;
+    color: var(--lightLineColor); /* Using light line color for footer text */
+}
+
+section {
+    margin-bottom: 20px;
+}

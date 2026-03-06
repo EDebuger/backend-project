@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/profile.css">
+</head>
+<body id="profileBody">
+    <header id="profileHeader">
+        <h1>User Profile</h1>
+        <div id="welcomeMessage"></div>
+        <button id="logoutButton" style="cursor: pointer;">Logout</button>
+    </header>
+    <main>
+        <section id="profileInfo">
+            <h2>Profile Information</h2>
+            <p><strong>Username:</strong> <span id="userName"></span></p>
+            <p><strong>Email:</strong> <span id="userEmail"></span></p>
+            <!-- Add more profile details as needed -->
+        </section>
+    </main>
+    <footer>
+        <section id="contactInfo"></section>
+        <section id="copyright"></section>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/check-login')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.loggedIn) {
+                        document.getElementById('userName').innerText = data.user.UserName;
+                        document.getElementById('userEmail').innerText = data.user.Email; // Example: assuming you have an email field
+                    } else {
+                        window.location.href = 'login.html'; // Redirect if not logged in
+                    }
+                });
+
+            document.getElementById('logoutButton').onclick = function() {
+                fetch('/logout') // Assuming you have a logout route
+                    .then(() => window.location.href = 'login.html');
+            };
+        });
+    </script>
+</body>
+</html>

@@ -6,10 +6,10 @@
     <title>webshop</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <header>
+<body id="mainBody">
+    <header id="mainHeader">
         <section id="top">
-            <div id="login" onclick="userPage()"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fw7.pngwing.com%2Fpngs%2F81%2F570%2Fpng-transparent-profile-logo-computer-icons-user-user-blue-heroes-logo.png&f=1&nofb=1&ipt=aa753eb580d3f5b8de29c33755204b1c9de321f081be3feeca931394bd834cc1" alt="profile icon"></div>
+            <div id="login"><button id="loginButton" style="cursor: pointer;">Login</button></div>
             <div id="logo"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fd1csarkz8obe9u.cloudfront.net%2Fposterpreviews%2Fprofessional-logo-design-template-99eb60199346b115b2cb5cd32eebb582_screen.jpg%3Fts%3D1621160488&f=1&nofb=1&ipt=78014ba0e2e1c7c8bb31674689281ed188a355c8fa24ca6b5a8a7b20e74b12da" alt="logo"></div>
             <div id="cart"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.freepnglogos.com%2Fuploads%2Fshopping-cart-png%2Fshopping-cart-svg-png-icon-download-28.png&f=1&nofb=1&ipt=2638c27563ce1513f34514d334b14de464d65fbbb8a986ba3597003d5b42f2f1" alt="cart logo"></div>
         </section>
@@ -17,13 +17,13 @@
             <div class="category" id="automativeButton"><p>Automotive</p></div>
             <div class="category" id="beautyButton">Beauty and Personal Care</p></div>
             <div class="category" id="bookButton"><p>Books</p></div>
-            <div class="category"><p><a href="">Clothing</a></p></div>
-            <div class="category"><p><a href="">Electronics</a></p></div>
-            <div class="category"><p><a href="">Garden</a></p></div>
-            <div class="category"><p><a href="">Health and Wellness</a></p></div>
-            <div class="category"><p><a href="">Home and Kitchen</a></p></div>
-            <div class="category"><p><a href="">Sports</a></p></div>
-            <div class="category"><p><a href="">Toys</a></p></div>
+            <div class="category"><p>Clothing</p></div>
+            <div class="category"><p>Electronics</p></div>
+            <div class="category"><p>Garden</p></div>
+            <div class="category"><p>Health and Wellness</p></div>
+            <div class="category"><p>Home and Kitchen</p></div>
+            <div class="category"><p>Sports</p></div>
+            <div class="category"><p>Toys</p></div>
         </section>
     </header>
     <main>
@@ -41,7 +41,18 @@
         <section id="copyright"></section>
         <section id="whatEverIHaventDecidedYet"></section>
     </footer>
-    <script src="script.js"></script>
-    <script src="server.js"></script>
+
+    <script>
+    document.getElementById("loginButton").onclick = function() {
+        window.location.href = 'login.html'; // respond if the server responds with redirect
+    };
+
+    document.getElementsByClassName(".category")    
+    
+
+
+        </script>
+    <script src="productPage.js"></script>
+    <script src="cartScript.js"></script>    
 </body>
 </html>

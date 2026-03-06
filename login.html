@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body id="loginBody">
+    <div id="userLoginPage"> <!--Live server körs på sin egen port. därför behövs node serverns port specifieras-->
+    <form action="http://localhost:3009/login" method="POST" id="userLoginForm" name="loginForm">
+        <div id="loginFormExit">X</div>
+        <input type="text" id="userName" name="userName" placeholder="user123" required>
+        <input type="password" id="userPassword" name="userPassword" placeholder="password" required>
+        <input type="submit" id="loginSubmitButton" value="Login">
+        <p id="createAccount">Create and account?</p>
+    </form>
+</div>
+<script>
+    document.querySelector("loginSubmitButton").innerHTML = 'submit';
+    const cross = document.querySelector("loginFormExit");
+    const page = document.querySelector("userLoginForm")
+    cross.onclick = () => { // Ta bort parrent och children följer
+        document.body.removeChild(page);
+    };
+</script>
+</body>
+</html>
