@@ -63,7 +63,10 @@ app.get(`/productInfo/:title`, (req,res) => { //Datan som ges är titeln
      console.log(req.method, req.path);
     });
 
-app.get(`/productInfo`, (req, res) => {
+/*---------------------------------------------------------------------------------- */
+/*---------------------------------------------------------------------------------- */
+/*---------------------------------------------------------------------------------- */
+app.get(`/productsAsc`, (req, res) => {
     const query = `SELECT p.productName AS title, c.categoryNames AS category, 
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.ProductName ASC`;
@@ -71,11 +74,11 @@ app.get(`/productInfo`, (req, res) => {
     db.query(query, (err, results) => {
         if(err) {
             console.error('Error fetching products', err);
-        return res.status(500).json({error: 'Database query failed'});}
+        return res.status(500).json({error: 'Database query failed'});}//status 500: Internal Server error
         
          // Se till att resultat kommer
         if (results.length === 0) {
-            return res.status(404).json({ error: 'No products found.' });
+            return res.status(404).json({ error: 'No products found.' });//status 404: Not found - classic
         }
 
         // Allting kommer som JSON
@@ -83,19 +86,79 @@ app.get(`/productInfo`, (req, res) => {
     });
 });
 
-app.get(`/productInfo`, (req, res) => { // Denna är som den ovan
+app.get(`/productsDesc`, (req, res) => { // Denna är som den ovan
     const query = `SELECT p.productName AS title, c.categoryNames AS category,
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.ProductName DESC`; //Men här så blir bokstavsordningen annorlunda
+                                                                                   //triggad av en js funktion fetch inuti en knapp
+    db.query(query, (err, results) => {
+        if(err) {
+            console.error('Error fetching products', err);
+        return res.status(500).json({error: 'Database query failed'});} //status 500: Internal Server error
+        
+         // Se till att resultat kommer
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No products found.' }); //status 404: Not found - classic
+        }
+
+        // Allting kommer som JSON
+        res.json(results);
+    });
+});
+
+app.get(`/pricesAsc`, (req, res) => { // Denna ordnar dom efter pris
+    const query = `SELECT p.productName AS title, c.categoryNames AS category, 
+    p.productDescription AS description, p.productPrice AS price FROM productInfo p 
+    RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.productPrice ASC`; //Från lägst till högst
 
     db.query(query, (err, results) => {
         if(err) {
             console.error('Error fetching products', err);
-        return res.status(500).json({error: 'Database query failed'});}
+        return res.status(500).json({error: 'Database query failed'});}//status 500: Internal Server error
         
          // Se till att resultat kommer
         if (results.length === 0) {
-            return res.status(404).json({ error: 'No products found.' });
+            return res.status(404).json({ error: 'No products found.' });//status 404: Not found - classic
+        }
+
+        // Allting kommer som JSON
+        res.json(results);
+    });
+});
+
+app.get(`/pricesDesc`, (req, res) => { // Denna ordnar dom efter pris
+    const query = `SELECT p.productName AS title, c.categoryNames AS category, 
+    p.productDescription AS description, p.productPrice AS price FROM productInfo p 
+    RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.productPrice DESC`; //Från högst till lägst
+
+    db.query(query, (err, results) => {
+        if(err) {
+            console.error('Error fetching products', err);
+        return res.status(500).json({error: 'Database query failed'});}//status 500: Internal Server error
+        
+         // Se till att resultat kommer
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No products found.' });//status 404: Not found - classic
+        }
+
+        // Allting kommer som JSON
+        res.json(results);
+    });
+});
+
+app.get(`/productSearch/:search`, (req, res) => { // Denna kommer användas för sökningsfunktionen
+    const query = `SELECT p.productName AS title, c.categoryNames AS category,
+    p.productDescription AS description, p.productPrice AS price FROM productInfo p 
+    RIGHT JOIN categories c ON p.Categories_ID = c.ID WHERE p.productName LIKE '%?%'`; //Kollar parametern och om någon innehåller den
+
+    db.query(query, req.params.search, (err, results) => {
+        if(err) {
+            console.error('Error fetching products', err);
+        return res.status(500).json({error: 'Database query failed'});}//status 500: Internal Server error
+        
+         // Se till att resultat kommer
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No products found.' });//status 404: Not found - classic
         }
 
         // Allting kommer som JSON
@@ -105,6 +168,29 @@ app.get(`/productInfo`, (req, res) => { // Denna är som den ovan
 
 
 
+app.get(`/productCategories/:category`, (req, res) => { // Den här förhoppningsvis kommer ta kategorier som parameter. en frontend mardröm
+    const query = `SELECT p.productName AS title, c.categoryNames AS category, 
+    p.productDescription AS description, p.productPrice AS price FROM productInfo p 
+    RIGHT JOIN categories c ON p.Categories_ID = c.ID WHERE c.categoryNames = ?`; 
+
+    db.query(query, req.params.category, (err, results) => {
+        if(err) {
+            console.error('Error fetching products', err);
+        return res.status(500).json({error: 'Database query failed'});}//status 500: Internal Server error
+        
+         // Se till att resultat kommer
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No products found.' });//status 404: Not found - classic
+        }
+
+        // Allting kommer som JSON
+        res.json(results);
+    });
+});
+/*----------------------------------------------------------------------------------- */
+/*----------------------------------------------------------------------------------- */
+/*----------------------------------------------------------------------------------- */
+// Denna är menad för en admins användning
 app.post(`/productInfo`, (req, res) => { //post don't have parameters
     db.query(`INSERT INTO productInfo (productName,productDescription,productPrice,categories_id) VALUES(?,?,?,?)`, (err, data) => {
         if(err) {console.error('Product was not inserted', err);

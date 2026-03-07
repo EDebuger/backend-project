@@ -14,32 +14,34 @@
             <div id="cart"><img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.freepnglogos.com%2Fuploads%2Fshopping-cart-png%2Fshopping-cart-svg-png-icon-download-28.png&f=1&nofb=1&ipt=2638c27563ce1513f34514d334b14de464d65fbbb8a986ba3597003d5b42f2f1" alt="cart logo"></div>
         </section>
         <section id="categories">
-            <div class="category" id="automativeButton"><p>Automotive</p></div>
-            <div class="category" id="beautyButton">Beauty and Personal Care</p></div>
-            <div class="category" id="bookButton"><p>Books</p></div>
-            <div class="category"><p>Clothing</p></div>
-            <div class="category"><p>Electronics</p></div>
-            <div class="category"><p>Garden</p></div>
-            <div class="category"><p>Health and Wellness</p></div>
-            <div class="category"><p>Home and Kitchen</p></div>
-            <div class="category"><p>Sports</p></div>
-            <div class="category"><p>Toys</p></div>
+            <div class="category" id="automativeBtn"><p>Automotive</p></div>
+            <div class="category" id="beautyBtn"><p>Beauty and Personal Care</p></div>
+            <div class="category" id="bookBtn"><p>Books</p></div>
+            <div class="category" id="clothingBtn"><p>Clothing</p></div>
+            <div class="category" id="electronicsBtn"><p>Electronics</p></div>
+            <div class="category" id="gardenBtn"><p>Garden</p></div>
+            <div class="category" id="healthBtn"><p>Health and Wellness</p></div>
+            <div class="category" id="homeBtn"><p>Home and Kitchen</p></div>
+            <div class="category" id="sportsBtn"><p>Sports</p></div>
+            <div class="category" id="toysBtn"><p>Toys</p></div>
         </section>
     </header>
     <main>
         <section id="productPage">
-            <div id="productFilters"></div>
+            <div id="productFilters">
+                <input type="button" value="A-Z" id="alphabet"> <!--sort by alphabetic order-->
+                <input type="button" value="Price" id="price"> <!--sort by price-->
+                <input type="text" id="searchBar" placeholder="Search..."> <!--Search products-->
+            </div>
             <div class="product">
-                <div class="productTitle"></div>
-                <div class="productDescription"></div>
-                <div class="productPrice"></div>
+                
             </div>
         </section>
     </main>
     <footer>
-        <section id="contactInfo"></section>
-        <section id="copyright"></section>
-        <section id="whatEverIHaventDecidedYet"></section>
+        <section id="contactInfo">Tel:040-555-10</section>
+        <section id="copyright">&Copyright 2026</section>
+        <section id="whatEverIHaventDecidedYet">Random info</section>
     </footer>
 
     <script>
@@ -52,6 +54,7 @@
 
 
         </script>
+    <script src="filterScript.js"></script>    
     <script src="productPage.js"></script>
     <script src="cartScript.js"></script>    
 </body>
