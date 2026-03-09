@@ -45,8 +45,8 @@ class productPage {
 
 
 
-
-fetch('http://localhost:3009/productsAsc') // Adjust the endpoint as needed
+ // Fires off on launch
+fetch('http://localhost:3009/productsAsc', {method:'GET',headers:{'Content-Type':'application/json; charset=utf-8'},}) // Adjust the endpoint as needed
     .then(response => response.json()) //Response är vad vi får tillbaka och blir en parameter
     .then(products => { // products blir json objekten
         products.forEach(product => {
@@ -62,21 +62,36 @@ fetch('http://localhost:3009/productsAsc') // Adjust the endpoint as needed
 /*------------------------------------------------------------------------------------------------- */
 
 
-    const query = document.getElementById("searchBar").innerText;
-const eQuery = encodeURIComponent(query);
+let debounceTimeout;    
 const searchBar = document.getElementById("searchBar");
+searchBar.addEventListener("input", function() {
+    debounceTimeout = setTimeout( () => {
+    const query = searchBar.value.trim();
+    const eQuery = encodeURIComponent(query);
+    if(eQuery) {
+       search(eQuery); }
+    }, 300)
+})
 
-searchBar.addEventListener("oninput", search(Equery))
 
 const search = (searchQuery) => { //Detta är sökfunktionen
-    document.getElementById("productPage").innerHTML=''; //tommar produktsidan först
+    const page = document.getElementById("productPage");
+    page.innerHTML=''; //tömmer produktsidan först
+    const filter = document.createElement("div"); filter.id='productFilters'; page.appendChild(filter);
+    const alph = document.createElement("input"); alph.id='alphabet'; alph.type='button'; alph.value='A-Z';
+    const pri = document.createElement("input"); pri.id='price'; pri.type='button'; pri.value='Price';
+    const sea = document.createElement("input"); sea.id='searchBar'; sea.type='text'; sea.placeholder='Search...';
+    filter.appendChild(alph); // Lägger tillbaka dessa element...
+    filter.appendChild(pri); // för jag glömde att dessa går också bort
+    filter.appendChild(sea); // oops
     if(!searchQuery) {
         alert("Actually type in something, thank you"); //om inget skrivs
         return;
     }
-    else if(NaN(searchQuery)) { //om något skrivs och är inte ett nummer
+    else if(isNaN(searchQuery)) { //om något skrivs och är inte ett nummer
+        const eSearch = encodeURIComponent(searchQuery);
 
-fetch(`http://localhost:3009/productSearch/search?query=${eQuery}`,)
+fetch(`http://localhost:3009/productSearch/search?query=${eSearch}`, {method:'GET',headers:{'Content-Type':'application/json; charset=utf-8'},})
     .then(response => response.json()) // får tillbaka en produkt
     .then(products => { //Enda produkten vi får tillbaka är den som någorlunda matchar queryn
         products.forEach(product => {
@@ -93,27 +108,48 @@ fetch(`http://localhost:3009/productSearch/search?query=${eQuery}`,)
 /*------------------------------------------------------------------------------------------------------- */
 /*------------------------------------------------------------------------------------------------------- */
 
-const ZA = document.getElementById("price"); //Bokstavsknappen
-ZA.addEventListener('onClick', nameDir(ZA.innerText));
+const ZA = document.getElementById("alphabet"); // Alphabet button
+
+ZA.addEventListener("click", function() {
+    nameDir(ZA.value);
+});
 
 function nameDir(direction) {
-    if(direction === "A-Z") { // Vänder om alfabetsordningen
-        document.getElementById("productPage").innerHTML='';
-    direction = "Z-A"
-fetch('http://localhost:3009/productsDesc') //Produktrerna från högst till lägst
-    .then(response => response.json())
-    .then(products => {
-        products.forEach(product => {
-            new productPage(product.title, product.category, product.description, product.price);
-        });
-    })
-    .catch(error => console.error('Error fetching products:', error));
-       }
+    const page = document.getElementById("productPage");
+    page.innerHTML = ''; // Clear the product page first
+    const filter = document.createElement("div"); 
+    filter.id = 'productFilters'; 
+    page.appendChild(filter);
+    
+    // Create and append elements
+    const alph = document.createElement("input"); 
+    alph.id = 'alphabet'; 
+    alph.type = 'button'; 
+    alph.value = (direction === "A-Z") ? "Z-A" : "A-Z"; // Toggle value between A-Z and Z-A
 
-     else if(direction === "Z-A") { // Ändrar tillbaka
-        document.getElementById("productPage").innerHTML='';
-    direction = "A-Z"
-fetch('http://localhost:3009/productsAsc') //Produktrerna från högst till lägst
+    const pri = document.createElement("input"); 
+    pri.id = 'price'; 
+    pri.type = 'button'; 
+    pri.value = 'Price';
+
+    const sea = document.createElement("input"); 
+    sea.id = 'searchBar'; 
+    sea.type = 'text'; 
+    sea.placeholder = 'Search...';
+
+    // Append newly created elements to filter
+    filter.appendChild(alph); 
+    filter.appendChild(pri); 
+    filter.appendChild(sea); 
+
+    // Determine the fetch URL based on current direction
+    const fetchUrl = (direction === "A-Z") ? 'http://localhost:3009/productsDesc' : 'http://localhost:3009/productsAsc';
+
+    // Perform the fetch operation
+    fetch(fetchUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    })
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
@@ -121,8 +157,8 @@ fetch('http://localhost:3009/productsAsc') //Produktrerna från högst till läg
         });
     })
     .catch(error => console.error('Error fetching products:', error));
-       } 
-    }
+}
+
 
     /*----------------------------------------------------------------------------------------------------- */
     /*----------------------------------------------------------------------------------------------------- */
@@ -131,13 +167,21 @@ fetch('http://localhost:3009/productsAsc') //Produktrerna från högst till läg
     /*----------------------------------------------------------------------------------------------------- */
 
     const price = document.getElementById("price"); //prisknappen
-price.addEventListener('onClick', priceDir(price.innerText));
+    price.addEventListener("click", function() {priceDir(price.value)});
 
 function priceDir(direction) {
     if(direction === "Price") { // neutral by default. Ändra till ascending
-        document.getElementById("productPage").innerHTML='';
-    direction = "Price-asc"
-fetch('http://localhost:3009/pricesAsc') //Produktrerna från billigast till dyraste
+    const page = document.getElementById("productPage");
+    page.innerHTML=''; //tömmer produktsidan först
+    const filter = document.createElement("div"); filter.id='productFilters'; page.appendChild(filter);
+    const alph = document.createElement("input"); alph.id='alphabet'; alph.type='button'; alph.value='A-Z';
+    const pri = document.createElement("input"); pri.id='price'; pri.type='button'; pri.value='Price';
+    const sea = document.createElement("input"); sea.id='searchBar'; sea.type='text'; sea.placeholder='Search...';
+    filter.appendChild(alph); // Lägger tillbaka dessa element...
+    filter.appendChild(pri); // för jag glömde att dessa går också bort
+    filter.appendChild(sea); // oops
+    pri.value = "Price-asc"
+fetch('http://localhost:3009/pricesAsc', {method:'GET',headers:{'Content-Type':'application/json; charset=utf-8'},}) //Produktrerna från billigast till dyraste
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
@@ -148,9 +192,17 @@ fetch('http://localhost:3009/pricesAsc') //Produktrerna från billigast till dyr
        }
 
      else if(direction === "Price-asc") { // Ändra till descending
-        document.getElementById("productPage").innerHTML='';
-    direction = "Price-desc"
-fetch('http://localhost:3009/productsDesc') //Produktrerna från högst till lägst
+    const page = document.getElementById("productPage");
+    page.innerHTML=''; //tömmer produktsidan först
+    const filter = document.createElement("div"); filter.id='productFilters'; page.appendChild(filter);
+    const alph = document.createElement("input"); alph.id='alphabet'; alph.type='button'; alph.value='A-Z';
+    const pri = document.createElement("input"); pri.id='price'; pri.type='button'; pri.value='Price';
+    const sea = document.createElement("input"); sea.id='searchBar'; sea.type='text'; sea.placeholder='Search...';
+    filter.appendChild(alph); // Lägger tillbaka dessa element...
+    filter.appendChild(pri); // för jag glömde att dessa går också bort
+    filter.appendChild(sea); // oops
+    pri.value = "Price-desc"
+fetch('http://localhost:3009/productsDesc', {method:'GET',headers:{'Content-Type':'application/json; charset=utf-8'},}) //Produktrerna från högst till lägst
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
@@ -170,41 +222,63 @@ fetch('http://localhost:3009/productsDesc') //Produktrerna från högst till lä
     // Här ska kategoriVäljarna vara
 
     const auto = document.getElementById("automativeBtn");// Om denna trycks blir den query
-    auto.addEventListener('onclick', changeCategory(auto.innerText) );
+    auto?.addEventListener('click', function() {
+    changeCategory(auto.innerText); });
+
     
     const bea = document.getElementById("beautyBtn");
-    bea.addEventListener('onclick', changeCategory(bea.innerText) );
+    bea?.addEventListener('click', function() {
+    changeCategory(bea.innerText); });
     
-    const boo = document.getElementById("booksBtn");
-    boo.addEventListener('onclick', changeCategory(boo.innerText) );
+    const boo = document.getElementById("bookBtn");
+    boo?.addEventListener('click', function() {
+    changeCategory(boo.innerText); });
     
     const clo = document.getElementById("clothingBtn");
-    clo.addEventListener('onclick', changeCategory(clo.innerText) );
+    clo?.addEventListener('click', function() {
+    changeCategory(clo.innerText); });
 
     const ele = document.getElementById("electronicsBtn");
-    ele.addEventListener('onclick', changeCategory(ele.innerText) );
+    ele?.addEventListener('click', function() {
+    changeCategory(ele.innerText); });
 
     const gar = document.getElementById("gardenBtn");
-    gar.addEventListener('onclick', changeCategory(gar.innerText) );
+    gar?.addEventListener('click', function() {
+    changeCategory(gar.innerText); });
 
     const hea = document.getElementById("healthBtn");
-    hea.addEventListener('onclick', changeCategory(hea.innerText) );
+    hea?.addEventListener('click', function() {
+    changeCategory(hea.innerText); });
 
     const hom = document.getElementById("homeBtn");
-    hom.addEventListener('onclick', changeCategory(hom.innerText) );
+    hom?.addEventListener('click', function() {
+    changeCategory(hom.innerText); });
 
     const spo = document.getElementById("sportsBtn");
-    spo.addEventListener('onclick', changeCategory(spo.innerText) );
-    
+    spo?.addEventListener('click', function() {
+    changeCategory(spo.innerText); });
+
     const toy = document.getElementById("toysBtn");
-    toy.addEventListener('onclick', changeCategory(toy.innerText) );
+    toy?.addEventListener('click', function() {
+    changeCategory(toy.innerText); });
 
 
     function changeCategory(category) {
-        document.getElementById("productPage").innerHTML='';
-        fetch(`http://localhost:3009/productCategories/category?query=${category}`,)
+        const page = document.getElementById("productPage");
+    page.innerHTML=''; //tömmer produktsidan först
+    const filter = document.createElement("div"); filter.id='productFilters'; page.appendChild(filter);
+    const alph = document.createElement("input"); alph.id='alphabet'; alph.type='button'; alph.value='A-Z';
+    const pri = document.createElement("input"); pri.id='price'; pri.type='button'; pri.value='Price';
+    const sea = document.createElement("input"); sea.id='searchBar'; sea.type='text'; sea.placeholder='Search...';
+    filter.appendChild(alph); // Lägger tillbaka dessa element...
+    filter.appendChild(pri); // för jag glömde att dessa går också bort
+    filter.appendChild(sea); // oops
+        
+        const eCategory = encodeURIComponent(category); //  säkerställer att speciella karaktärer inte skruvar till queryn
+        fetch(`http://localhost:3009/productCategories/category?query=${toString(eCategory)}`, {method:'GET',headers:{'Content-Type':'application/json; charset=utf-8'},})
     .then(response => response.json()) // får tillbaka produkterna som matchar kategorin
     .then(products => { 
+            console.log('products', products);
         products.forEach(product => {
             new productPage(product.title, product.category, product.description, product.price);
         });
