@@ -44,12 +44,7 @@ app.get(`/categories`, (req, res) => { // commonJS fil tar an datan
     });console.log(req.method, req.path);
 });
 
-app.get(`/categories/:id`, (req, res) => { //express ger till common
-  db.query(`SELECT * FROM categories WHERE ID = ?`, req.params.id, (err, data) => {
-        res.send(data);
-    console.log(req.method, req.path);
-    });
-});
+
 /*app.get("/categories/:id", (req, res) => { // express skickar direkt till HTML
   db.query(`SELECT * FROM categories WHERE ID = ?`, req.params.id, (err, data) => { // Hur får man in data från olika celler
         res.send(`<div class=/'product/'><div class=/'productTitle/'>${}</div><div class=/'productDescription/'>${}</div><div class=/'productPrice/'>${}</div></div>`);
@@ -171,19 +166,20 @@ app.get(`/productSearch/:search`, (req, res) => { // Denna kommer användas för
 app.get(`/productCategories/:category`, (req, res) => { // Den här förhoppningsvis kommer ta kategorier som parameter. en frontend mardröm
     const query = `SELECT p.productName AS title, c.categoryNames AS category, 
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
-    RIGHT JOIN categories c ON p.Categories_ID = c.ID WHERE c.categoryNames = ?`; 
+    RIGHT JOIN categories c ON p.Categories_ID = c.ID WHERE c.categoryNames = ?`; //queryn går fel? Varför?
 
     db.query(query, req.params.category, (err, results) => {
         if(err) {
-            console.error('Error fetching products', err);
+            console.error('Error fetching products', err); // om den inte når databasen
         return res.status(500).json({error: 'Database query failed'});}//status 500: Internal Server error
         
          // Se till att resultat kommer
         if (results.length === 0) {
             return res.status(404).json({ error: 'No products found.' });//status 404: Not found - classic
         }
-
+        
         // Allting kommer som JSON
+        console.log(req.header);
         res.json(results);
     });
 });
