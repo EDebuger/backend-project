@@ -62,19 +62,19 @@ fetch('http://localhost:3009/productsAsc', {method:'GET',headers:{'Content-Type'
 /*------------------------------------------------------------------------------------------------- */
 
 
-let debounceTimeout;    
+    
 const searchBar = document.getElementById("searchBar");
-searchBar.addEventListener("input", function() {
-    debounceTimeout = setTimeout( () => {
+searchBar.addEventListener("input", function() { // 'input' tar första intypade karaktären - fixa sen
+    
     const query = searchBar.value.trim();
     const eQuery = encodeURIComponent(query);
     if(eQuery) {
        search(eQuery); }
-    }, 300)
+    
 })
 
 
-const search = (searchQuery) => { //Detta är sökfunktionen
+function search(searchQuery)  { //Detta är sökfunktionen
     const page = document.getElementById("productPage");
     page.innerHTML=''; //tömmer produktsidan först
     const filter = document.createElement("div"); filter.id='productFilters'; page.appendChild(filter);
@@ -274,10 +274,10 @@ fetch('http://localhost:3009/productsDesc', {method:'GET',headers:{'Content-Type
     filter.appendChild(pri); // för jag glömde att dessa går också bort
     filter.appendChild(sea); // oops
         
-        const eCategory = encodeURIComponent(category); //  säkerställer att speciella karaktärer inte skruvar till queryn
-        fetch(`http://localhost:3009/productCategories/category?query=${toString(eCategory)}`, {method:'GET',headers:{'Content-Type':'application/json; charset=utf-8'},})
+     const eCategory = encodeURIComponent(category); //  säkerställer att speciella karaktärer inte skruvar till queryn
+        fetch(`http://localhost:3009/productCategories/${eCategory}`, {method:'GET',headers:{'Content-Type':'application/json; charset=utf-8'},})
     .then(response => response.json()) // får tillbaka produkterna som matchar kategorin
-    .then(products => { 
+.then(products => { 
             console.log('products', products);
         products.forEach(product => {
             new productPage(product.title, product.category, product.description, product.price);
