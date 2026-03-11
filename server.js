@@ -188,6 +188,7 @@ app.get(`/productCategories/:category`, (req, res) => { // Den här förhoppning
 /*----------------------------------------------------------------------------------- */
 // Denna är menad för en admins användning
 app.post(`/productInfo`, (req, res) => { //post don't have parameters
+    console.log(req.body);
     db.query(`INSERT INTO productInfo (productName,productDescription,productPrice,categories_id) VALUES(?,?,?,?)`, (err, data) => {
         if(err) {console.error('Product was not inserted', err);
             return res.status(406); }

@@ -1,0 +1,71 @@
+:root { /* ihopkastad av AI för att spara tid */
+    --primaryColor: #cd1010;
+    --secondaryColor: #ff033e;
+    --accentColor: #bcd4e6;
+    --linecColor: #e28812; 
+    --ligthLineColor: #f6f15c;
+    --wildOption: #da9100; 
+    --wilderOption: #f3c863;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--accentColor);
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    background-color: var(--primaryColor);
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+}
+
+h1, h2 {
+    color: var(--linecColor);
+}
+
+section {
+    background-color: white;
+    border: 2px solid var(--ligthLineColor);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 20px;
+}
+
+button {
+    background-color: var(--wildOption);
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--wilderOption);
+}
+
+input[type="text"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid var(--linecColor);
+    border-radius: 4px;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+    border-color: var(--secondaryColor);
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--primaryColor);
+}
