@@ -187,16 +187,27 @@ app.get(`/productCategories/:category`, (req, res) => { // Den här förhoppning
 /*----------------------------------------------------------------------------------- */
 /*----------------------------------------------------------------------------------- */
 // Denna är menad för en admins användning
-app.post(`/productInfo`, (req, res) => { //post don't have parameters
+app.post(`/productInsert`, (req, res) => {  // inserted with body
     console.log(req.body);
-    db.query(`INSERT INTO productInfo (productName,productDescription,productPrice,categories_id) VALUES(?,?,?,?)`, (err, data) => {
+    const {productName, productDescription, productPrice, productCategory} = req.body; //request body contains the input info as objects
+
+    const query = `INSERT INTO productInfo (productName,productDescription,productPrice, categories_ID) VALUES(?,?,?,(SELECT ID FROM Categories WHERE categoryNames = ?))`;
+    db.query(query, [productName, productDescription, productPrice, productCategory], (err, data) => {
         if(err) {console.error('Product was not inserted', err);
             return res.status(406); }
 
-        res.json(data)});
+            console.log(bodyparser.json(data));
+            res.json(data); // when sent, the method ends. not before
+})
     console.log(req.method,req.path);
 });
 
+app.get(`/getUsers`, (req, res) => { //admin ska få lista av allting
+    db.query(`SELECT ID,userName,userEmail FROM userInformation`, (err, data) => {
+        if(err) throw err;
+        res.json(data); //json objekten kan läggas in med constructor
+    })
+})
 
 
 /*app.post(`/userInformation`, (req, res) => {// Make a user
@@ -224,6 +235,7 @@ app.post(`/login`, (req, res) => {
             res.send('Invalid name or password, get out');
         }
     });
+
 }); // get skickar dig tillbaka till huvudsidan
 app.get('/index', (req, res) => {
     if(req.session.user) {
@@ -239,13 +251,6 @@ app.get('/toLogin', (req, res) => {
 
 /*-------------------------------------------------------------------------------------------*/ 
 
-
-app.get(`/getUsers`, (req, res) => {
-    db.query(`SELECT * FROM userInformation`, (err, data) => {
-        if(err) throw err;
-        res.json(data);
-    })
-})
 
 
 
