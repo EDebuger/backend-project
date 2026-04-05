@@ -62,7 +62,7 @@ app.get(`/productInfo/:title`, (req,res) => { //Datan som ges är titeln
 /*---------------------------------------------------------------------------------- */
 /*---------------------------------------------------------------------------------- */
 app.get(`/productsAsc`, (req, res) => {
-    const query = `SELECT p.productName AS title, c.categoryNames AS category, 
+    const query = `SELECT p.ID as id, p.productName AS title, c.categoryNames AS category, 
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.ProductName ASC`;
 

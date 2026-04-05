@@ -1,5 +1,6 @@
 class productPage {
-    constructor(title, category, description, price) {
+    constructor(id,title, category, description, price) {
+        this.id = id;
         this.title = title;
         this.category = category;
         this.description = description;
@@ -28,20 +29,36 @@ class productPage {
         const plusButton = document.createElement("button"); // Create button
         plusButton.classList.add("plusButton"); // Add class
         plusButton.textContent = "+"; // Set button text
-        plusButton.onclick = () => {
-            // Logic to add the product to the cart can be implemented here
-            console.log(`Added ${this.title} to cart`);
+        plusButton.addEventListener('click', () => {
+            const itemData = {
+            id: this.title,              // use unique id in real app
+            title: this.title,
+            price: Number(this.price),
+            category: this.category
         };
+         window.items.push(itemData); //
+        console.log(`Added ${this.title} to cart`);
 
-        // Append all elements to the product card
-        page.appendChild(titleElement);
-        page.appendChild(descriptionElement);
-        page.appendChild(priceElement);
-        page.appendChild(plusButton);
+        if (typeof window.cartAddItem === 'function') {
+    window.cartAddItem(itemData);
+  } else {
+    console.warn('cartAddItem not available');
+  }
 
-        console.log(`Product ${this.title} is now displayed.`);
-    }
+  console.log(`Added ${this.title} to items array`);
+;
+    })
+    
+    // Append all elements to the product card
+    page.appendChild(titleElement);
+    page.appendChild(descriptionElement);
+    page.appendChild(priceElement);
+    page.appendChild(plusButton);
+    
+    console.log(`Product ${this.id}: ${this.title} is now displayed.`);
+};
 }
+
 
 
 
@@ -50,7 +67,7 @@ fetch('http://localhost:3009/productsAsc', {method:'GET',headers:{'Content-Type'
     .then(response => response.json()) //Response är vad vi får tillbaka och blir en parameter
     .then(products => { // products blir json objekten
         products.forEach(product => {
-            new productPage(product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.title, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
@@ -95,7 +112,7 @@ fetch(`http://localhost:3009/productSearch/search?query=${eSearch}`, {method:'GE
     .then(response => response.json()) // får tillbaka en produkt
     .then(products => { //Enda produkten vi får tillbaka är den som någorlunda matchar queryn
         products.forEach(product => {
-            new productPage(product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.title, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching product:', error));
@@ -153,7 +170,7 @@ function nameDir(direction) {
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
-            new productPage(product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.title, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
@@ -185,7 +202,7 @@ fetch('http://localhost:3009/pricesAsc', {method:'GET',headers:{'Content-Type':'
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
-            new productPage(product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.title, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
@@ -206,7 +223,7 @@ fetch('http://localhost:3009/productsDesc', {method:'GET',headers:{'Content-Type
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
-            new productPage(product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.title, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
@@ -280,7 +297,7 @@ fetch('http://localhost:3009/productsDesc', {method:'GET',headers:{'Content-Type
 .then(products => { 
             console.log('products', products);
         products.forEach(product => {
-            new productPage(product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.title, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
