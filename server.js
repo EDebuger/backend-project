@@ -62,7 +62,7 @@ app.get(`/productInfo/:title`, (req,res) => { //Datan som ges är titeln
 /*---------------------------------------------------------------------------------- */
 /*---------------------------------------------------------------------------------- */
 app.get(`/productsAsc`, (req, res) => {
-    const query = `SELECT p.ID as id, p.productName AS title, c.categoryNames AS category, 
+    const query = `SELECT p.ID as id, p.productName AS name, c.categoryNames AS category, 
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.ProductName ASC`;
 
@@ -82,7 +82,7 @@ app.get(`/productsAsc`, (req, res) => {
 });
 
 app.get(`/productsDesc`, (req, res) => { // Denna är som den ovan
-    const query = `SELECT p.productName AS title, c.categoryNames AS category,
+    const query = `SELECT p.productName AS name, c.categoryNames AS category,
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.ProductName DESC`; //Men här så blir bokstavsordningen annorlunda
                                                                                    //triggad av en js funktion fetch inuti en knapp
@@ -102,7 +102,7 @@ app.get(`/productsDesc`, (req, res) => { // Denna är som den ovan
 });
 
 app.get(`/pricesAsc`, (req, res) => { // Denna ordnar dom efter pris
-    const query = `SELECT p.productName AS title, c.categoryNames AS category, 
+    const query = `SELECT p.productName AS name, c.categoryNames AS category, 
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.productPrice ASC`; //Från lägst till högst
 
@@ -122,7 +122,7 @@ app.get(`/pricesAsc`, (req, res) => { // Denna ordnar dom efter pris
 });
 
 app.get(`/pricesDesc`, (req, res) => { // Denna ordnar dom efter pris
-    const query = `SELECT p.productName AS title, c.categoryNames AS category, 
+    const query = `SELECT p.productName AS name, c.categoryNames AS category, 
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID ORDER BY p.productPrice DESC`; //Från högst till lägst
 
@@ -142,7 +142,7 @@ app.get(`/pricesDesc`, (req, res) => { // Denna ordnar dom efter pris
 });
 
 app.get(`/productSearch/:search`, (req, res) => { // Denna kommer användas för sökningsfunktionen
-    const query = `SELECT p.productName AS title, c.categoryNames AS category,
+    const query = `SELECT p.productName AS name, c.categoryNames AS category,
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID WHERE p.productName LIKE '%?%'`; //Kollar parametern och om någon innehåller den
 
@@ -164,7 +164,7 @@ app.get(`/productSearch/:search`, (req, res) => { // Denna kommer användas för
 
 
 app.get(`/productCategories/:category`, (req, res) => { // Den här förhoppningsvis kommer ta kategorier som parameter. en frontend mardröm
-    const query = `SELECT p.productName AS title, c.categoryNames AS category, 
+    const query = `SELECT p.productName AS name, c.categoryNames AS category, 
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
     RIGHT JOIN categories c ON p.Categories_ID = c.ID WHERE c.categoryNames = ?`; //queryn går fel? Varför?
 
@@ -201,7 +201,24 @@ app.post(`/productInsert`, (req, res) => {  // inserted with body
 })
     console.log(req.method,req.path);
 });
+// delete a product
+app.delete(`/productRemove`, (req, res) => {  // inserted with body
+    console.log(req.body);
+    const {productName} = req.body; // expecting one parameter
 
+    const query = `DELETE FROM productInfo WHERE productName = ?`; // deletes one row
+    db.query(query, [productName], (err, data) => {
+        if(err) {console.error('Product was not deleted', err);
+            return res.status(406); }
+
+            console.log(bodyparser.json(data));
+            res.json(data); // when sent, the method ends. not before
+})
+    console.log(req.method,req.path);
+});
+
+
+// get a JSON list of all users
 app.get(`/getUsers`, (req, res) => { //admin ska få lista av allting
     db.query(`SELECT ID,userName,userEmail FROM userInformation`, (err, data) => {
         if(err) throw err;
@@ -209,7 +226,23 @@ app.get(`/getUsers`, (req, res) => { //admin ska få lista av allting
     })
 })
 
+app.get(`/getUserByName/:name`, (req, res) => { // Denna kommer användas för sökningsfunktionen
+    const query = `SELECT * FROM userInformation WHERE userName = ?`; //Kollar parametern och om någon innehåller den
 
+    db.query(query, req.params.name, (err, results) => {
+        if(err) {
+            console.error('Error fetching user', err);
+        return res.status(500).json({error: 'Database query failed'});}//status 500: Internal Server error
+        
+         // Se till att resultat kommer
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'found no user' });//status 404: Not found - classic
+        }
+
+        // Allting kommer som JSON
+        res.json(results);
+    });
+});
 /*app.post(`/userInformation`, (req, res) => {// Make a user
     const{uName, email, uPass,time} = req.body;
     db.query(`INSERT INTO userInformation (userName,userEmail,userPassword,createTime) VALUES (?,?,?,?)`, [uName, email, uPass], (err, result) => {
