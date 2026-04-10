@@ -11,6 +11,10 @@
     box-sizing: border-box;
 }
 
+main {
+    width: 100vw;
+    height: auto;
+} /*I don't even remember why these are split up but i'm afraid to change it*/
 #mainBody {z-index: 0;}
 #loginBody {background-color: var(--primaryColor);}
 
@@ -58,7 +62,7 @@
     margin-top: auto;
     margin-bottom: auto;
     border: 1px var(--ligthLineColor) solid;
-}
+} #cart:hover {cursor: pointer;}
 
 #categories {
     display: flex;
@@ -133,9 +137,13 @@
 
 
 
-main {
-    width: 100vw;
-    height: auto;
+#productFilters {
+    display: block;
+    height: 30px;
+    width: 100%;
+    background-color: var(--secondaryColor);
+    border: 3px --ligthLineColor solid;
+    
 }
 #productPage { /*parent*/
     display: flex;
@@ -145,19 +153,12 @@ main {
     border: 3px var(--linecColor) solid;
     justify-self: center;
 }
-#productFilters {
-    display: block;
-    height: 30px;
-    width: 100%;
-    background-color: var(--secondaryColor);
-    border: 3px --ligthLineColor solid;
-    
-}
 .product {
     height: 200px;
     width: 130px;
     margin-left: 10px;
     margin-right: 10px;
+    margin-bottom: 10px;
     border: 1px black solid;
     display: grid;
     grid-template-columns: 1fr; /* One column layout */
@@ -192,9 +193,12 @@ main {
     grid-area: plus; /* No quotes needed */
     color: var(--secondaryColor);
     border: 1px black solid;
-}
+} .plusButton:hover {cursor: pointer;}
 
 footer {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
     background-color: yellow;
     width: 100vw;
     height: 10vh;

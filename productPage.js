@@ -39,8 +39,8 @@ class productPage {
          window.items.push(itemData); //
         console.log(`Added ${this.title} to cart`);
 
-        if (typeof window.cartAddItem === 'function') {
-    window.cartAddItem(itemData);
+        if (typeof cartAddItem === 'function') {
+    cartAddItem(itemData);
   } else {
     console.warn('cartAddItem not available');
   }
@@ -67,7 +67,7 @@ fetch('http://localhost:3009/productsAsc', {method:'GET',headers:{'Content-Type'
     .then(response => response.json()) //Response är vad vi får tillbaka och blir en parameter
     .then(products => { // products blir json objekten
         products.forEach(product => {
-            new productPage(product.id, product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.name, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
@@ -81,43 +81,81 @@ fetch('http://localhost:3009/productsAsc', {method:'GET',headers:{'Content-Type'
 
     
 const searchBar = document.getElementById("searchBar");
-searchBar.addEventListener("input", function() { // 'input' tar första intypade karaktären - fixa sen
-    
+
+
+// Trigger search only when Enter is pressed
+searchBar.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
     const query = searchBar.value.trim();
-    const eQuery = encodeURIComponent(query);
-    if(eQuery) {
-       search(eQuery); }
-    
-})
+    search(query);
+  }
+});
 
+// AI suggested this:
+// If you also want an immediate live-search (after typing stops), uncomment:
+// searchBar.addEventListener("input", debounce(() => {
+//   const q = searchBar.value.trim();
+//   if (q) search(q);
+// }, 400));
 
-function search(searchQuery)  { //Detta är sökfunktionen
-    const page = document.getElementById("productPage");
-    page.innerHTML=''; //tömmer produktsidan först
-    const filter = document.createElement("div"); filter.id='productFilters'; page.appendChild(filter);
-    const alph = document.createElement("input"); alph.id='alphabet'; alph.type='button'; alph.value='A-Z';
-    const pri = document.createElement("input"); pri.id='price'; pri.type='button'; pri.value='Price';
-    const sea = document.createElement("input"); sea.id='searchBar'; sea.type='text'; sea.placeholder='Search...';
-    filter.appendChild(alph); // Lägger tillbaka dessa element...
-    filter.appendChild(pri); // för jag glömde att dessa går också bort
-    filter.appendChild(sea); // oops
-    if(!searchQuery) {
-        alert("Actually type in something, thank you"); //om inget skrivs
-        return;
-    }
-    else if(isNaN(searchQuery)) { //om något skrivs och är inte ett nummer
-        const eSearch = encodeURIComponent(searchQuery);
+function search(searchQuery) {
+  const page = document.getElementById("productPage");
+  page.innerHTML = ''; // clear product area first
 
-fetch(`http://localhost:3009/productSearch/search?query=${eSearch}`, {method:'GET',headers:{'Content-Type':'application/json; charset=utf-8'},})
-    .then(response => response.json()) // får tillbaka en produkt
-    .then(products => { //Enda produkten vi får tillbaka är den som någorlunda matchar queryn
-        products.forEach(product => {
-            new productPage(product.id, product.title, product.category, product.description, product.price);
-        });
+  // recreate filter UI (but do NOT recreate the searchBar input with same id)
+  const filter = document.createElement("div");
+  filter.id = 'productFilters';
+  page.appendChild(filter);
+
+  const alph = document.createElement("input");
+  alph.id = 'alphabet';
+  alph.type = 'button';
+  alph.value = 'A-Z';
+
+  const pri = document.createElement("input");
+  pri.id = 'price';
+  pri.type = 'button';
+  pri.value = 'Price';
+
+  // Instead of creating another input with id="searchBar", reuse the existing one:
+  const existingSearchBar = document.getElementById("searchBar");
+  // Move it into the filter so it remains the same element and keeps its listeners/state
+  filter.appendChild(alph);
+  filter.appendChild(pri);
+  if (existingSearchBar) filter.appendChild(existingSearchBar);
+
+  if (!searchQuery) {
+    alert("Actually type in something, thank you");
+    return;
+  }
+
+  // If the query is numeric and you want to treat it differently, handle here.
+  // Otherwise just perform the GET with encoded query.
+  if (isNaN(searchQuery) || typeof searchQuery === 'string') {
+    const eSearch = encodeURIComponent(searchQuery);
+    fetch(`http://localhost:3009/productSearch/search?query=${eSearch}`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
     })
-    .catch(error => console.error('Error fetching product:', error));
-    }
+      .then(response => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then(products => {
+        // Ensure products is an array
+        if (!products) return;
+        if (!Array.isArray(products)) products = [products];
+
+        products.forEach(product => {
+          // Adjust constructor args to match your productPage signature
+          // Earlier you used (title, category, description, price)
+          new productPage(product.id, product.name, product.category, product.description, product.price);
+        });
+      })
+      .catch(error => console.error('Error fetching product:', error));
+  }
 }
+
 
 /*------------------------------------------------------------------------------------------------------- */
 /*------------------------------------------------------------------------------------------------------- */
@@ -170,7 +208,7 @@ function nameDir(direction) {
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
-            new productPage(product.id, product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.name, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
@@ -202,7 +240,7 @@ fetch('http://localhost:3009/pricesAsc', {method:'GET',headers:{'Content-Type':'
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
-            new productPage(product.id, product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.name, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
@@ -223,7 +261,7 @@ fetch('http://localhost:3009/productsDesc', {method:'GET',headers:{'Content-Type
     .then(response => response.json())
     .then(products => {
         products.forEach(product => {
-            new productPage(product.id, product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.name, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));
@@ -242,7 +280,7 @@ fetch('http://localhost:3009/productsDesc', {method:'GET',headers:{'Content-Type
     auto?.addEventListener('click', function() {
     changeCategory(auto.innerText); });
 
-    
+    // question marks checks if there's something there before it can call any function
     const bea = document.getElementById("beautyBtn");
     bea?.addEventListener('click', function() {
     changeCategory(bea.innerText); });
@@ -297,7 +335,7 @@ fetch('http://localhost:3009/productsDesc', {method:'GET',headers:{'Content-Type
 .then(products => { 
             console.log('products', products);
         products.forEach(product => {
-            new productPage(product.id, product.title, product.category, product.description, product.price);
+            new productPage(product.id, product.name, product.category, product.description, product.price);
         });
     })
     .catch(error => console.error('Error fetching products:', error));

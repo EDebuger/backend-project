@@ -1,22 +1,23 @@
-const cartBtn = document.getElementById("cart");
-if (!cartBtn) throw new Error("Missing #cart element");
+const cartBtn = document.getElementById("cart"); // the div cart
+if (!cartBtn) throw new Error("Missing #cart element"); // it exists, don't worry
 
-window.items = window.items || [];
-let cartState = {
+window.items = window.items || []; // either there's something or it's an empty array
+let cartState = { // where we will add the products
   // items keyed by productId: { id, title, price, discountPrice?, quantity, meta? }
   items: {} // initiated empty
 };
 
-document.getElementsByClassName("plusButton").addEventListener('click', addItem());
 
-cartBtn.addEventListener('click', () => {
+//document.getElementsByClassName("plusButton").addEventListener('click', window.cartAddItem(this)); // it works according to console log
+
+cartBtn.addEventListener('click', () => { // does not work
   // Toggle: if cart exists remove it, otherwise create
   const existing = document.getElementById("cartBody");
   if (existing) existing.remove(); // acts like a toggle
-  else cartModule();
+  else cartModule(); // launches it off
 });
 
-function cartModule() {
+function cartModule() { // creates the module where everything is shown
   const body = document.createElement("div");
   body.id = "cartBody"; // main body
 
@@ -52,7 +53,7 @@ function cartModule() {
   const checkoutBtn = document.createElement("button");
   checkoutBtn.classList.add("checkoutBtn");
   checkoutBtn.textContent = "Betala";
-  checkoutBtn.addEventListener('click', () => {
+  checkoutBtn.addEventListener('click', () => { // when the checkout button is pressed
     if (Object.keys(cartState.items).length === 0) { // Object is the common point between constructed objects, i think
       alert("Kundvagnen är tom.");// checks if any itmes were added, if zero- this outputs
       return; // returns what's in the code block
@@ -75,31 +76,47 @@ function cartModule() {
 
   // initial render
   renderProducts(container, totalValue);
+  // window-scope
+  let totalQty = 0;
 
-  // Expose a helper to window so other scripts can add items
-  window.cartAddItem = function(item) {
+  // make it a global attribute that gets defined here
+  const cartAddItem = function(item) { // can 'this' be recognised as an object
     // item: { id (string|number), title, price (number), discountPrice (optional number), meta (optional) }
     if (!item || !item.id || !item.title || typeof item.price !== 'number') { // if any property is not right
       console.warn("cartAddItem: invalid item", item);
       return;
     }
-    const key = String(item.id); //
-    if (!cartState.items[key]) {
-      cartState.items[key] = { ...item, qty: 1 };
+    const key = String(item.id); // read as string
+    if (!cartState.items[key]) { // cartState is an object that contains only 'items: []'
+      cartState.items[key] = { ...item, qty: 1 }; // products are recognised by id | if not then it's assumed to be the first
     } else {
-      cartState.items[key].qty += 1;
+      cartState.items[key].qty += 1; // its qty property increases everytime something's added
     }
+    totalQty++; // counts for every product
     renderProducts(container, totalValue);
   };
 
   // Also expose removeAll for testing
   window.cartClear = function() {
-    cartState.items = {};
+    cartState.items = {}; // clear list when prompted
     renderProducts(container, totalValue);
   };
+
+  if(totalQty>0) {
+  const show = document.createElement("div");
+  cartBtn.appendChild(show); // make it part of it
+  show.style.zIndex = 800;
+  show.style.display = sticky;
+  show.style.width = 20;
+  show.style.height = 10;
+  show.style.borderRadius = 10;
+  show.style.alignContent = center; 
+  show.textContent = String(totalQty) // displays current value
+    // since it runs every time cartAddItem fires off, it updates
+  }
 }
 
-// Render logic: builds product nodes from cartState.items
+// how it gets displayed inside, call for each product
 function renderProducts(containerEl, totalValueEl) {
   containerEl.innerHTML = '';
   const keys = Object.keys(cartState.items);
@@ -114,7 +131,7 @@ function renderProducts(containerEl, totalValueEl) {
 
   let grandTotal = 0; // total of all
   keys.forEach(key => {
-    const it = cartState.items[key];
+    const item = cartState.items[key];
     const product = document.createElement("div");
     product.classList.add("product");
 
@@ -122,13 +139,13 @@ function renderProducts(containerEl, totalValueEl) {
     left.classList.add("productName");
     const title = document.createElement("div");
     title.classList.add("title");
-    title.textContent = it.title;
+    title.textContent = item.title;
     left.appendChild(title);
-    if (it.meta) {
-      const meta = document.createElement("div");
-      meta.classList.add("meta");
-      meta.textContent = it.meta;
-      left.appendChild(meta);
+    if (item.category) {
+      const cateogry = document.createElement("div");
+      cateogry.classList.add("category");
+      cateogry.textContent = item.category;
+      left.appendChild(cateogry);
     }
 
     const right = document.createElement("div");
@@ -136,13 +153,13 @@ function renderProducts(containerEl, totalValueEl) {
 
     const priceP = document.createElement("p");
     priceP.classList.add("productPrice");
-    const priceToUse = (typeof it.discountPrice === 'number' && it.discountPrice < it.price) ? it.discountPrice : it.price;
-    priceP.textContent = formatCurrency(priceToUse * it.qty);
+    const priceToUse = (typeof item.discountPrice === 'number' && item.discountPrice < item.price) ? item.discountPrice : item.price;
+    priceP.textContent = formatCurrency(priceToUse * item.qty);
 
-    if (typeof it.discountPrice === 'number' && it.discountPrice < it.price) {
+    if (typeof it.discountPrice === 'number' && item.discountPrice < item.price) { // in retrospect, this is a needless hurdle
       const disc = document.createElement("p");
       disc.classList.add("priceDiscount");
-      disc.textContent = formatCurrency(it.price * it.qty);
+      disc.textContent = formatCurrency(item.price * item.qty); // calculate total of all instances of the product
       right.appendChild(disc);
     }
 
@@ -150,12 +167,12 @@ function renderProducts(containerEl, totalValueEl) {
     const manip = document.createElement("div");
     manip.classList.add("productManipulate");
 
-    const minus = document.createElement("div");
+    const minus = document.createElement("div"); // minus button
     minus.classList.add("minusBtn");
     minus.textContent = "−";
     minus.addEventListener('click', () => {
       it.qty = Math.max(0, it.qty - 1);
-      if (it.qty === 0) delete cartState.items[key];
+      if (it.qty === 0) delete cartState.items[key]; // if there are none left, remove item container
       renderProducts(containerEl, totalValueEl);
     });
 
@@ -163,12 +180,12 @@ function renderProducts(containerEl, totalValueEl) {
     counter.classList.add("productCounter");
     counter.textContent = String(it.qty); // qty is a attribute
 
-    const plus = document.createElement("div");
+    const plus = document.createElement("div"); // plus button
     plus.classList.add("plusBtn");
     plus.textContent = "+";
     plus.addEventListener('click', () => {
-      it.qty += 1;
-      renderProducts(containerEl, totalValueEl);
+      item.qty += 1; // how many do you have
+      renderProducts(containerEl, totalValueEl); // renders it over again with the new total
     });
 
     manip.appendChild(minus);

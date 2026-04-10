@@ -1,48 +1,281 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Page</title>
-    <link rel="stylesheet" href="admin.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Page</title>
+  <link rel="stylesheet" href="admin.css" />
 </head>
 <body>
-    <header>
-        <h1>Admin Dashboard</h1>
-    </header>
-    
-    <main>
-        <section>
-            <h2>Registered Users</h2>
-            <button id="viewUsersButton">View Registered Users</button>
-            <input type="text" id="searchUser" placeholder="Search for a user...">
-            <button id="searchButton">Search</button>
-        </section>
-        
-        <section>
-            <h2>Add New Product</h2>
-            <form id="productForm">
-                <label for="productName">Product Name:</label>
-                <input type="text" id="productName" required>
-                
-                <label for="productCategory">Category:</label>
-                <input type="text" id="productCategory" required>
-                
-                <label for="productDescription">Description:</label>
-                <textarea id="productDescription" required></textarea>
-                
-                <label for="productPrice">Price:</label>
-                <input type="number" id="productPrice" required min="0 step="0.01">
-                
-                <button type="submit">Add Product</button>
-            </form>
-        </section>
-    </main>
+  <header>
+    <h1>Admin Dashboard</h1>
+  </header>
 
-    <footer>
-        <p>&copy; 2027 Admin Dashboard</p>
-    </footer>
+  <main>
+    <div class="controls">
+      <button id="openUsersBtn">Open Registered Users</button>
+      <button id="openAddProductBtn">Open Add Product</button>
+      <button id="openDeleteProductBtn">Open Delete Product</button>
+    </div>
 
-    <script src="admin.js"></script>
+    <section id="usersSection" class="hidden">
+      <h2>Registered Users</h2>
+      <div class="controls">
+        <input type="text" id="searchUser" placeholder="Search for a user..." />
+        <button id="searchUserBtn">Search</button>
+        <button id="viewUsersButton">View All Users</button>
+      </div>
+      <div id="usersResults" class="resultList"></div>
+    </section>
+
+    <section id="addProductSection" class="hidden">
+      <h2>Add New Product</h2>
+      <form id="productForm">
+        <div>
+          <label for="productName">Product Name:</label><br />
+          <input type="text" id="productName" required />
+        </div>
+        <div>
+          <label for="productCategory">Category:</label><br />
+          <input type="text" id="productCategory" required />
+        </div>
+        <div>
+          <label for="productDescription">Description:</label><br />
+          <textarea id="productDescription" required rows="3"></textarea>
+        </div>
+        <div>
+          <label for="productPrice">Price:</label><br />
+          <input type="number" id="productPrice" required min="0" step="0.01" />
+        </div>
+        <div style="margin-top:8px;">
+          <button type="submit" class="primary">Add Product</button>
+        </div>
+      </form>
+      <div id="addProductMsg" style="margin-top:8px;color:#333;"></div>
+    </section>
+
+    <section id="deleteProductSection" class="hidden">
+      <h2>Delete Product</h2>
+      <div class="controls">
+        <input type="text" id="deleteProductName" placeholder="Enter product name to delete..." />
+        <button id="deleteProductBtn">Delete</button>
+        <button id="listProductsBtn">List All Products</button>
+      </div>
+      <div id="deleteMsg" style="margin-top:8px;color:#333;"></div>
+      <div id="productList" class="resultList"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2027 Admin Dashboard</p>
+  </footer>
+
+  <script>
+  // admin.js - simple, backend-driven admin UI (no localStorage, no user-related code)
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Elements
+  const openAddProductBtn = document.getElementById('openAddProductBtn');
+  const openDeleteProductBtn = document.getElementById('openDeleteProductBtn');
+
+  const addProductSection = document.getElementById('addProductSection');
+  const deleteProductSection = document.getElementById('deleteProductSection');
+
+  const productForm = document.getElementById('productForm');
+  const addProductMsg = document.getElementById('addProductMsg');
+
+  const deleteProductName = document.getElementById('deleteProductName');
+  const deleteProductBtn = document.getElementById('deleteProductBtn');
+  const listProductsBtn = document.getElementById('listProductsBtn');
+  const deleteMsg = document.getElementById('deleteMsg');
+  const productList = document.getElementById('productList');
+
+  // State (in-memory only)
+  let products = [];
+
+  // called when it needs to be displayed none
+  function hideAll() {
+    addProductSection.classList.add('hidden');
+    deleteProductSection.classList.add('hidden');
+  }
+   //opposite
+  function show(section) {
+    hideAll();
+    section.classList.remove('hidden');
+  }
+
+  function textOrEmpty(v) { return v == null ? '' : String(v); }
+
+  // Fetch helpers (adjust endpoints if your API differs)
+  async function fetchProductsFromServer() {
+    try {
+      const res = await fetch('http://localhost:3009/productsAsc');
+      if (!res.ok) throw new Error(res.status);
+      products = await res.json();
+      return products; // returns so other functions can handle the resultset
+      console.log("retrieved products");
+    } catch (err) {
+      console.error('fetchProducts error', err);
+      products = [];
+      return products;
+    }
+  }
+
+  // Renderers
+  function renderProducts(list) { // makes the list
+    productList.innerHTML = '';
+    if (!list || list.length === 0) {
+      productList.textContent = 'No products.';
+      return;
+    }
+    list.forEach(p => {
+      const row = document.createElement('div'); // styling rules for each product
+      row.className = 'resultItem';
+      const left = document.createElement('div');
+      left.textContent = `${p.id ?? '—'} — ${p.name ?? ''} (${p.category ?? ''}) — ${Number(p.price ?? 0).toFixed(2)} SEK`;
+      const controls = document.createElement('div');
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.textContent = 'Delete';
+      delBtn.addEventListener('click', () => deleteProductByName(p));
+      controls.appendChild(delBtn);
+      row.appendChild(left);
+      row.appendChild(controls);
+      productList.appendChild(row);
+    });
+  }
+
+  // Section openers
+  openAddProductBtn.addEventListener('click', () => {
+    show(addProductSection);
+    addProductMsg.textContent = '';
+    productForm.reset();
+  });
+
+  openDeleteProductBtn.addEventListener('click', async () => {
+    show(deleteProductSection);
+    addProductMsg.textContent = '';
+    deleteMsg.textContent = '';
+    await fetchProductsFromServer(); // it gets it
+    renderProducts(products); // it organises them
+  });
+
+  // Add product
+  productForm.addEventListener('submit', async (e) => {
+    e.preventDefault(); // not totally sure...
+    addProductMsg.textContent = '';
+    addProductMsg.style.color = '#333';
+
+    const name = (document.getElementById('productName').value || '').trim();
+    const category = (document.getElementById('productCategory').value || '').trim();
+    const description = (document.getElementById('productDescription').value || '').trim();
+    const price = Number(document.getElementById('productPrice').value);
+
+    if (!name || !category || !description || Number.isNaN(price) || price < 0) {
+      addProductMsg.textContent = 'Please fill valid product details.';
+      return;
+    }
+
+    if (!confirm(`Create product "${name}" for ${price.toFixed(2)}?`)) return;
+
+    try {
+      const res = await fetch('http://localhost:3009/productInsert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: name,
+          productDescription: description,
+          productPrice: price,
+          productCategory: category
+        })
+      });
+      if (!res.ok) {
+        const t = await res.text().catch(() => '');
+        addProductMsg.textContent = `Server error: ${res.status} ${t}`;
+        return;
+      } console.log(`Product ${name} has been inserted`);
+      await fetchProductsFromServer();
+      renderProducts(products);
+      addProductMsg.style.color = 'green';
+      addProductMsg.textContent = `Added "${name}".`;
+      productForm.reset();
+      setTimeout(() => addProductMsg.textContent = '', 3000);
+    } catch (err) {
+      console.error('Add product error', err);
+      addProductMsg.textContent = 'Network error while adding product.';
+    }
+  });
+
+  // Delete helpers
+  async function deleteProductByName(p) {
+    try {
+      let res;
+        res = await fetch('http://localhost:3009/productRemove', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productName: p.name })
+        });
+      if (!res.ok) {
+        deleteMsg.textContent = `Server error: ${res.status}`;
+      }
+      return; console.log(`Product: ${p.name} has been deleted`);
+      await fetchProductsFromServer();
+      renderProducts(products);
+      deleteMsg.style.color = 'green';
+      deleteMsg.textContent = `Deleted "${p.name}".`;
+      setTimeout(() => deleteMsg.textContent = '', 3000);
+    } catch (err) {
+      console.error('Delete error', err);
+      deleteMsg.textContent = 'Network error while deleting product.';
+    }
+  }
+
+  // Delete by name input
+  deleteProductBtn.addEventListener('click', async () => {
+    deleteMsg.textContent = '';
+    deleteMsg.style.color = '#333';
+    const q = (deleteProductName.value || '').trim();
+    if (!q) {
+      deleteMsg.textContent = 'Enter a product name to delete.';
+      return;
+    }
+    if (!confirm(`Delete product(s) named "${q}"?`)) return;
+    try {
+      const res = await fetch('http://localhost:3009/productRemove', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ productName: q })
+      });
+      if (!res.ok) {
+        const t = await res.text().catch(() => '');
+        deleteMsg.textContent = `Server error: ${res.status} ${t}`;
+        return;
+      }console.log(`Product ${q} has been deleted`);
+      await fetchProductsFromServer();
+      renderProducts(products);
+      deleteMsg.style.color = 'green';
+      deleteMsg.textContent = `Requested delete for "${q}".`;
+      setTimeout(() => deleteMsg.textContent = '', 3000);
+    } catch (err) {
+      console.error('Delete by name error', err);
+      deleteMsg.textContent = 'Network error while deleting product.';
+    }
+  });
+
+  deleteProductName.addEventListener('keydown', (e) => { if (e.key === 'Enter') deleteProductBtn.click(); }); // either Enter or click
+
+  // List products button
+  listProductsBtn.addEventListener('click', async () => {
+    await fetchProductsFromServer();
+    renderProducts(products);
+  });
+
+  // Initialize: show add product by default
+  show(addProductSection);
+  fetchProductsFromServer();
+});
+
+  </script>
+  <script src="admin.js"></script>
 </body>
 </html>
