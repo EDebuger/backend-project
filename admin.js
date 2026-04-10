@@ -14,7 +14,7 @@ class User {
       });
       if (!response.ok) throw new Error(`Fetch failed ${response.status}`);
       const usersData = await response.json();
-      const users = usersData.map(u => new User(u.userID, u.userName, u.userEmail));
+      const users = usersData.map(u => new User(u.ID, u.userName, u.userEmail));
       this.displayUsers(users);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);
@@ -30,7 +30,7 @@ class User {
       });
       if (!response.ok) throw new Error(`Fetch failed ${response.status}`);
       const usersData = await response.json();
-      const users = usersData.map(u => new User(u.userID, u.userName, u.userEmail));
+      const users = usersData.map(u => new User(u.ID, u.userName, u.userEmail));
       this.displayUsers(users);
     } catch (error) {
       console.error('There was a problem with the fetch operation:', error);

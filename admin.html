@@ -93,12 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // State (in-memory only)
   let products = [];
 
-  // Helpers
+  // called when it needs to be displayed none
   function hideAll() {
     addProductSection.classList.add('hidden');
     deleteProductSection.classList.add('hidden');
   }
-
+   //opposite
   function show(section) {
     hideAll();
     section.classList.remove('hidden');
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('http://localhost:3009/productsAsc');
       if (!res.ok) throw new Error(res.status);
       products = await res.json();
-      return products;
+      return products; // returns so other functions can handle the resultset
       console.log("retrieved products");
     } catch (err) {
       console.error('fetchProducts error', err);
@@ -156,8 +156,8 @@ document.addEventListener('DOMContentLoaded', () => {
     show(deleteProductSection);
     addProductMsg.textContent = '';
     deleteMsg.textContent = '';
-    await fetchProductsFromServer();
-    renderProducts(products);
+    await fetchProductsFromServer(); // it gets it
+    renderProducts(products); // it organises them
   });
 
   // Add product
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!confirm(`Create product "${name}" for ${price.toFixed(2)}?`)) return;
 
     try {
-      const res = await fetch('/productInsert', {
+      const res = await fetch('http://localhost:3009/productInsert', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const t = await res.text().catch(() => '');
         addProductMsg.textContent = `Server error: ${res.status} ${t}`;
         return;
-      }
+      } console.log(`Product ${name} has been inserted`);
       await fetchProductsFromServer();
       renderProducts(products);
       addProductMsg.style.color = 'green';

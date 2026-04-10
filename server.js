@@ -142,11 +142,12 @@ app.get(`/pricesDesc`, (req, res) => { // Denna ordnar dom efter pris
 });
 
 app.get(`/productSearch/:search`, (req, res) => { // Denna kommer användas för sökningsfunktionen
+    const term = `%${req.params.search}%`;
     const query = `SELECT p.productName AS name, c.categoryNames AS category,
     p.productDescription AS description, p.productPrice AS price FROM productInfo p 
-    RIGHT JOIN categories c ON p.Categories_ID = c.ID WHERE p.productName LIKE '%?%'`; //Kollar parametern och om någon innehåller den
+    RIGHT JOIN categories c ON p.Categories_ID = c.ID WHERE p.productName LIKE ?`; //Kollar parametern och om någon innehåller den
 
-    db.query(query, req.params.search, (err, results) => {
+    db.query(query, [term], (err, results) => {
         if(err) {
             console.error('Error fetching products', err);
         return res.status(500).json({error: 'Database query failed'});}//status 500: Internal Server error
@@ -220,14 +221,14 @@ app.delete(`/productRemove`, (req, res) => {  // inserted with body
 
 // get a JSON list of all users
 app.get(`/getUsers`, (req, res) => { //admin ska få lista av allting
-    db.query(`SELECT ID,userName,userEmail FROM userInformation`, (err, data) => {
+    db.query(`SELECT ID, userName, userEmail FROM userInformation`, (err, data) => {
         if(err) throw err;
         res.json(data); //json objekten kan läggas in med constructor
     })
 })
 
 app.get(`/getUserByName/:name`, (req, res) => { // Denna kommer användas för sökningsfunktionen
-    const query = `SELECT * FROM userInformation WHERE userName = ?`; //Kollar parametern och om någon innehåller den
+    const query = `SELECT ID, userName, userEmail FROM userInformation WHERE userName = ?`; //Kollar parametern och om någon innehåller den
 
     db.query(query, req.params.name, (err, results) => {
         if(err) {

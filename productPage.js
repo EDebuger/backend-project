@@ -39,8 +39,8 @@ class productPage {
          window.items.push(itemData); //
         console.log(`Added ${this.title} to cart`);
 
-        if (typeof window.cartAddItem === 'function') {
-    window.cartAddItem(itemData);
+        if (typeof cartAddItem === 'function') {
+    cartAddItem(itemData);
   } else {
     console.warn('cartAddItem not available');
   }
@@ -280,7 +280,7 @@ fetch('http://localhost:3009/productsDesc', {method:'GET',headers:{'Content-Type
     auto?.addEventListener('click', function() {
     changeCategory(auto.innerText); });
 
-    
+    // question marks checks if there's something there before it can call any function
     const bea = document.getElementById("beautyBtn");
     bea?.addEventListener('click', function() {
     changeCategory(bea.innerText); });
