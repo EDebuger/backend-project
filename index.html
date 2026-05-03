@@ -114,11 +114,17 @@ function cartModule() { // creates the module where everything is shown
   checkoutBtn.textContent = "Betala";
   checkoutBtn.addEventListener('click', () => { // when the checkout button is pressed
     if (Object.keys(cartState.items).length === 0) { // Object is the common point between constructed objects, i think
-      alert("Kundvagnen är tom.");// checks if any itmes were added, if zero- this outputs
-      return; // returns what's in the code block
+      alert("Kundvagnen är tom.");
+      return;
     }
     // placeholder checkout behavior
     alert("Checkout: " + totalValue.textContent);
+      // test out with user 1 first
+    fetch(`http://localhost:3009/makeOrder/${1}`, {method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},})
+    for(const p in cartState.items) {
+      const pr = cartState.items[p]; // take the value
+      fetch(`http://localhost:3009/orderProducts/${pr}`, {method:'POST',headers:{'Content-Type':'application/json; charset=utf-8'},})
+    }
     // After checkout, clear cart:
     cartState.items = {};
     renderProducts(container, totalValue);
@@ -135,12 +141,11 @@ function cartModule() { // creates the module where everything is shown
 
   // initial render
   renderProducts(container, totalValue);
-  // window-scope
+ 
   let totalQty = 0;
 
-
   // make it a global attribute that gets defined here
-  function cartAddItem(item) { // can 'this' be recognised as an object
+  const cartAddItem = function(item) { // can 'this' be recognised as an object
     // item: { id (string|number), title, price (number), discountPrice (optional number), meta (optional) }
     if (!item || !item.id || !item.title || typeof item.price !== 'number') { // if any property is not right
       console.warn("cartAddItem: invalid item", item);
@@ -154,7 +159,11 @@ function cartModule() { // creates the module where everything is shown
     }
     totalQty++; // counts for every product
     renderProducts(container, totalValue);
-  }; globalCartAddItem = cartAddItem;
+  }; 
+
+  // expose globally so productPage can call it
+  globalCartAddItem = cartAddItem;
+  if (typeof window !== 'undefined') window.cartAddItem = cartAddItem;
 
   // Also expose removeAll for testing
   cartClear = function() {
@@ -163,18 +172,21 @@ function cartModule() { // creates the module where everything is shown
   };
 
   if(totalQty>0) {
-  const show = document.createElement("div");
-  cartBtn.appendChild(show); // make it part of it
-  show.style.zIndex = 800;
-  show.style.display = sticky;
-  show.style.width = 20;
-  show.style.height = 10;
-  show.style.borderRadius = 10;
-  show.style.alignContent = center; 
-  show.textContent = String(totalQty) // displays current value
-    // since it runs every time cartAddItem fires off, it updates
+    const show = document.createElement("div");
+    cartBtn.appendChild(show); // make it part of it
+    show.style.zIndex = 800;
+    show.style.display = sticky;
+    show.style.width = 20;
+    show.style.height = 10;
+    show.style.borderRadius = 10;
+    show.style.alignContent = center; 
+    show.textContent = String(totalQty) // displays current value
+      // since it runs every time cartAddItem fires off, it updates
   }
 }
+
+
+
 
 // how it gets displayed inside, call for each product
 function renderProducts(containerEl, totalValueEl) {
@@ -202,10 +214,10 @@ function renderProducts(containerEl, totalValueEl) {
     title.textContent = item.title;
     left.appendChild(title);
     if (item.category) {
-      const cateogry = document.createElement("div");
-      cateogry.classList.add("category");
-      cateogry.textContent = item.category;
-      left.appendChild(cateogry);
+      const category = document.createElement("div");
+      category.classList.add("category");
+      category.textContent = item.category;
+      left.appendChild(category);
     }
 
     const right = document.createElement("div");
@@ -213,15 +225,8 @@ function renderProducts(containerEl, totalValueEl) {
 
     const priceP = document.createElement("p");
     priceP.classList.add("productPrice");
-    const priceToUse = (typeof item.discountPrice === 'number' && item.discountPrice < item.price) ? item.discountPrice : item.price;
-    priceP.textContent = formatCurrency(priceToUse * item.qty);
-
-    if (typeof it.discountPrice === 'number' && item.discountPrice < item.price) { // in retrospect, this is a needless hurdle
-      const disc = document.createElement("p");
-      disc.classList.add("priceDiscount");
-      disc.textContent = formatCurrency(item.price * item.qty); // calculate total of all instances of the product
-      right.appendChild(disc);
-    }
+    // no discount logic; show price * qty
+    priceP.textContent = (item.price * item.qty).toFixed(2) + " kr";
 
     // manipulator
     const manip = document.createElement("div");
@@ -231,14 +236,14 @@ function renderProducts(containerEl, totalValueEl) {
     minus.classList.add("minusBtn");
     minus.textContent = "−";
     minus.addEventListener('click', () => {
-      it.qty = Math.max(0, it.qty - 1);
-      if (it.qty === 0) delete cartState.items[key]; // if there are none left, remove item container
+      item.qty = Math.max(0, item.qty - 1);
+      if (item.qty === 0) delete cartState.items[key]; // if there are none left, remove item container
       renderProducts(containerEl, totalValueEl);
     });
 
     const counter = document.createElement("div");
     counter.classList.add("productCounter");
-    counter.textContent = String(it.qty); // qty is a attribute
+    counter.textContent = String(item.qty); // qty is a attribute
 
     const plus = document.createElement("div"); // plus button
     plus.classList.add("plusBtn");
@@ -260,16 +265,12 @@ function renderProducts(containerEl, totalValueEl) {
 
     containerEl.appendChild(product);
 
-    grandTotal += priceToUse * it.qty;
+    grandTotal += item.price * item.qty;
   });
 
-  totalValueEl.textContent = formatCurrency(grandTotal);
+  totalValueEl.textContent = grandTotal.toFixed(2) + " kr";
 }
 
-// Utility: format currency (SEK)
-function formatCurrency(num) {
-    return num.toLocaleString('sv-SE', { style: 'currency', currency: 'SEK' });
-}
 
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
@@ -279,7 +280,6 @@ function formatCurrency(num) {
 //---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
-var prodShow = []; // global
 class productPage {
     constructor(id,title, category, description, price) {
         this.id = id;
@@ -327,7 +327,6 @@ class productPage {
             } else {
                 console.warn('cartAddItem not available');
             }
-              prodShow.push({category: this.category})
             
         })
         

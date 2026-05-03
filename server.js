@@ -285,7 +285,37 @@ app.get('/toLogin', (req, res) => {
 
 /*-------------------------------------------------------------------------------------------*/ 
 
+app.post('/makeOrder/:customerId', (req, res) => { // just for creating the cart and connecting it to the customer
+    const id = req.body // placeholder until i know what to send
+    db.query("START TRANSACTION; INSERT INTO cart(user_id) VALUES(?); COMMIT;", id, (err, data) => { // Transaction just in case
+        if(err) throw error;
 
+        if(data.length == 0) {
+            throw res.statusCode;
+        }
+        else {throw "cart processed"}
+        
+    });//for now...
+    //const arr = []; // initialised empty
+     //expecting an array productNames
+    //let Nsql = "";
+    //req.params.productList.forEach(element => {
+        
+    //});
+    //const Csql = `UPDATE cart INSERT INTO (user_ID) VALUES (${req.params.customerId})`;
+    //const Psql = `UPDATE cartProductList INSERT INTO ()`;
+})
+app.post('/orderProducts/:product', (req, res) => {
+    const p = req.body; // product name
+    db.query("START TRANSACTION; INSERT INTO cartproductlist(cart_id,allproducts) VALUES((SELECT last_insert_id() FROM cart),(SELECT productname FROM allproducts WHERE name = ?)); COMMIT;", p, (err, data) => {
+        if(err) throw err;
+
+        if(data.length.length==0) {
+            throw res.statusCode;
+        }
+        else {throw `product ${p} was inserted`}
+    })
+})
 
 
 const newPrice = 20.00;
